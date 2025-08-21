@@ -1,0 +1,89 @@
+.App {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Additional custom styles for the App component */
+.form-group label {
+  position: relative;
+}
+
+.form-group label::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  transition: width 0.3s ease;
+}
+
+.form-group:hover label::after {
+  width: 100%;
+}
+
+.radio-option input[type="radio"]:checked + span {
+  color: #667eea;
+  font-weight: 600;
+}
+
+/* Loading animation */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.result.loading {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Success animation */
+@keyframes successPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.result.success {
+  animation: successPulse 0.6s ease;
+}
+
+/* Form validation styles */
+.form-group.error label {
+  color: #e53e3e;
+}
+
+.form-group.error .radio-option {
+  border-color: #e53e3e;
+}
+
+/* Responsive improvements */
+@media (max-width: 480px) {
+  .header h1 {
+    font-size: 1.8rem;
+  }
+  
+  .header p {
+    font-size: 1rem;
+  }
+  
+  .card {
+    padding: 15px;
+  }
+  
+  .btn {
+    padding: 12px 24px;
+    font-size: 16px;
+  }
+}
