@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import './App.css';
 
+// This determines which API to use (live or local)
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+
 function App() {
   const [formData, setFormData] = useState({});
   const [prediction, setPrediction] = useState(null);
@@ -10,81 +13,44 @@ function App() {
 
   // Define all the features in the correct order as expected by the model
   const features = [
-    "Gender",
-    "SchoolType",
-    "StudiesDaily",
-    "AttendsExtraClasses",
-    "UsesOnlineLearningPlatforms",
-    "HasFixedStudySchedule",
-    "ParticipatesGroupStudy",
-    "SleepsAtLeast7Hours",
-    "UsesSocialMediaDuringStudyHours",
-    "SubmitsAssignmentsOnTime",
-    "EnjoysReading",
-    "ParticipatesInSchoolActivities",
-    "UsesTutor",
-    "PrefersStudyingAlone",
-    "AttendsSchoolRegularly",
-    "HasPartTimeJob",
-    "UsesPlannerForSchoolwork",
-    "GetsNervousBeforeExams",
-    "PrefersOnlineClasses",
-    "TakesNotesInClass",
-    "HasQuietStudyEnvironment"
+    "Gender", "SchoolType", "StudiesDaily", "AttendsExtraClasses",
+    "UsesOnlineLearningPlatforms", "HasFixedStudySchedule", "ParticipatesGroupStudy",
+    "SleepsAtLeast7Hours", "UsesSocialMediaDuringStudyHours", "SubmitsAssignmentsOnTime",
+    "EnjoysReading", "ParticipatesInSchoolActivities", "UsesTutor",
+    "PrefersStudyingAlone", "AttendsSchoolRegularly", "HasPartTimeJob",
+    "UsesPlannerForSchoolwork", "GetsNervousBeforeExams", "PrefersOnlineClasses",
+    "TakesNotesInClass", "HasQuietStudyEnvironment"
   ];
 
   // Feature display names for better UX
   const featureDisplayNames = {
-    "Gender": "Gender",
-    "SchoolType": "School Type",
-    "StudiesDaily": "Studies Daily",
-    "AttendsExtraClasses": "Attends Extra Classes",
-    "UsesOnlineLearningPlatforms": "Uses Online Learning Platforms",
-    "HasFixedStudySchedule": "Has Fixed Study Schedule",
-    "ParticipatesGroupStudy": "Participates in Group Study",
-    "SleepsAtLeast7Hours": "Sleeps At Least 7 Hours",
-    "UsesSocialMediaDuringStudyHours": "Uses Social Media During Study Hours",
-    "SubmitsAssignmentsOnTime": "Submits Assignments On Time",
-    "EnjoysReading": "Enjoys Reading",
-    "ParticipatesInSchoolActivities": "Participates in School Activities",
-    "UsesTutor": "Uses Tutor",
-    "PrefersStudyingAlone": "Prefers Studying Alone",
-    "AttendsSchoolRegularly": "Attends School Regularly",
-    "HasPartTimeJob": "Has Part-Time Job",
-    "UsesPlannerForSchoolwork": "Uses Planner for Schoolwork",
-    "GetsNervousBeforeExams": "Gets Nervous Before Exams",
-    "PrefersOnlineClasses": "Prefers Online Classes",
-    "TakesNotesInClass": "Takes Notes in Class",
-    "HasQuietStudyEnvironment": "Has Quiet Study Environment"
+    "Gender": "Gender", "SchoolType": "School Type", "StudiesDaily": "Studies Daily",
+    "AttendsExtraClasses": "Attends Extra Classes", "UsesOnlineLearningPlatforms": "Uses Online Learning Platforms",
+    "HasFixedStudySchedule": "Has a Fixed Study Schedule", "ParticipatesGroupStudy": "Participates in Group Study",
+    "SleepsAtLeast7Hours": "Sleeps At Least 7 Hours", "UsesSocialMediaDuringStudyHours": "Uses Social Media During Study Hours",
+    "SubmitsAssignmentsOnTime": "Submits Assignments On Time", "EnjoysReading": "Enjoys Reading",
+    "ParticipatesInSchoolActivities": "Participates in School Activities", "UsesTutor": "Uses Tutor",
+    "PrefersStudyingAlone": "Prefers Studying Alone", "AttendsSchoolRegularly": "Attends School Regularly",
+    "HasPartTimeJob": "Has Part-Time Job", "UsesPlannerForSchoolwork": "Uses Planner for Schoolwork",
+    "GetsNervousBeforeExams": "Gets Nervous Before Exams", "PrefersOnlineClasses": "Prefers Online Classes",
+    "TakesNotesInClass": "Takes Notes in Class", "HasQuietStudyEnvironment": "Has Quiet Study Environment"
   };
 
   // Feature options
   const featureOptions = {
-    "Gender": [
-      { value: "0", label: "Female" },
-      { value: "1", label: "Male" }
-    ],
-    "SchoolType": [
-      { value: "0", label: "Government" },
-      { value: "1", label: "Private" }
-    ],
+    "Gender": [{ value: "0", label: "Female" }, { value: "1", label: "Male" }],
+    "SchoolType": [{ value: "0", label: "Government" }, { value: "1", label: "Private" }],
     // All other features are Yes/No
     ...Object.fromEntries(
       features.slice(2).map(feature => [
         feature,
-        [
-          { value: "0", label: "No" },
-          { value: "1", label: "Yes" }
-        ]
+        [{ value: "0", label: "No" }, { value: "1", label: "Yes" }]
       ])
     )
   };
 
   const handleRadioChange = (feature, value) => {
-    setFormData(prev => ({
-      ...prev,
-      [feature]: value
-    }));
+    setFormData(prev => ({ ...prev, [feature]: value }));
   };
 
   const isFormComplete = () => {
@@ -93,7 +59,6 @@ function App() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     if (!isFormComplete()) {
       setError("Please fill in all fields before submitting.");
       return;
@@ -104,10 +69,11 @@ function App() {
     setPrediction(null);
 
     try {
-      // Prepare features in the correct order
+      // Prepare features in the correct order by mapping over the master 'features' array
       const featureValues = features.map(feature => parseInt(formData[feature]));
       
-      const response = await axios.post('/predict', {
+      // Send the request to the correct API endpoint (live or local)
+      const response = await axios.post(`${API_URL}/predict`, {
         features: featureValues
       });
 
@@ -128,7 +94,6 @@ function App() {
 
   const renderFeatureGroup = (feature) => {
     const options = featureOptions[feature];
-
     return (
       <div key={feature} className="form-group">
         <label>{featureDisplayNames[feature]}</label>
@@ -167,12 +132,7 @@ function App() {
         <div className="card">
           <form onSubmit={handleSubmit}>
             <div className="features-grid">
-              {renderFeatureGroup("Gender")}
-              {renderFeatureGroup("SchoolType")}
-            </div>
-
-            <div className="features-grid">
-              {features.slice(2).map(feature => renderFeatureGroup(feature))}
+              {features.map(feature => renderFeatureGroup(feature))}
             </div>
 
             <div style={{ textAlign: 'center', marginTop: '30px' }}>
